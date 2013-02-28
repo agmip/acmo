@@ -4,11 +4,46 @@
 
   <groupId>org.agmip</groupId>
   <artifactId>acmo</artifactId>
-  <version>2.0-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>acmo</name>
+  <name>ACMO Library</name>
   <url>http://maven.apache.org</url>
+
+  <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <issueManagement>
+        <url>https://github.com/agmip/acmo/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>https://raw.github.com/agmip/acmo/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/agmip/acmo</url>
+        <connection>scm:git:git://github.com/agmip/acmo.git</connection>
+        <developerConnection>scm:git:git@github.com:agmip/acmo.git</developerConnection>
+      <tag>HEAD</tag>
+  </scm>
+
+    <developers>
+        <developer>
+            <email>cvillalobos@ufl.edu</email>
+            <name>Christopher Villalobos</name>
+            <url>https://github.com/frostbytten</url>
+            <id>frostbytten</id>
+        </developer>
+    </developers>
+
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,12 +53,17 @@
     <dependency>
       <groupId>org.agmip</groupId>
       <artifactId>agmip-core</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.0.9</version>
+    </dependency>
+    <dependency>
+      <groupId>org.agmip</groupId>
+      <artifactId>dome</artifactId>
+      <version>1.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

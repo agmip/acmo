@@ -112,7 +112,7 @@ public class AcmoUtil {
         acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "seasonal_strategy", "")));
         acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "exname", "")));
         acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "trt_name", "")));
-        acmoData.add("0XXX");
+        acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "clim_id", "0XXX")));
         acmoData.add("1");
         if (! seasonalStrategyString.equals("")) {
             domeBase = DomeUtil.unpackDomeName(seasonalStrategyString);
