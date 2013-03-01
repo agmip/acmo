@@ -1,5 +1,7 @@
 package org.agmip.acmo.translators;
 
+import java.io.File;
+
 public interface AcmoTranslator {
-    public boolean execute(String sourceFolder, String destFolder);
+    public File execute(String sourceFolder, String destFolder);
 }
