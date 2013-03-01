@@ -326,4 +326,27 @@ public class AcmoUtil {
     private static String quoteMe(String unquoted) {
         return "\""+unquoted+"\"";
     }
+    
+    /**
+     * Generate an ACMO CSV file object with a non-repeated file name in 
+     * the given directory.
+     *
+     * @param outputCsvPath The output path for CSV file
+     * @param mode The name of model which provide the model output data
+     * @return The {@code File} for CSV file
+     */
+    public static File createCsvFile(String outputCsvPath, String mode) {
+        if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.equals("")) {
+            outputCsvPath += File.separator;
+        }
+        outputCsvPath += "ACMO_" + mode;
+        File f = new File(outputCsvPath + ".csv");
+        int count = 1;
+        while (f.exists()) {
+            f = new File(outputCsvPath + " (" + count + ").csv");
+            count++;
+        }
+        
+        return f;
+    }
 }
