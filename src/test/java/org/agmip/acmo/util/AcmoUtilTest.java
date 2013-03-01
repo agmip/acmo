@@ -1,5 +1,9 @@
 package org.agmip.acmo.util;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.junit.After;
@@ -18,7 +22,7 @@ import org.agmip.acmo.util.AcmoUtil;
 public class AcmoUtilTest {
     private static final Logger log = LoggerFactory.getLogger(AcmoUtilTest.class);
     private HashMap<String, Object> coreMap = new HashMap<String, Object>();
-    
+
     @Before
     public void populateCoreMap() {
         AcePathfinderUtil.insertValue(coreMap, "pdate", "19810101");
@@ -89,5 +93,29 @@ public class AcmoUtilTest {
 
         assertEquals("Number of tillage events incorrect", "2", results.get("ti_count"));
         assertEquals("Tillage implements incorrect", "Moldboard plow 20 cm depth|Chisel plow, straight point", results.get("tiimp"));
+    }
+
+    @Test
+    public void createCsvFileTest() {
+        String mode = "TEST";
+        String outputCsvPath = "";
+        String expected_1 = "ACMO_" + mode + ".csv";
+        String expected_2 = "ACMO_" + mode + " (1).csv";
+
+        // Test the case of no pre-existing file 
+        File f1 = AcmoUtil.createCsvFile(outputCsvPath, mode);
+        assertEquals(mode, expected_1, f1.getName());
+
+        // Test the case of pre-existing file 
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f1));
+            bw.close();
+        } catch (IOException ex) {
+            assertTrue(f1.exists());
+        }
+        File f2 = AcmoUtil.createCsvFile(outputCsvPath, mode);
+        assertEquals(mode, expected_2, f2.getName());
+        f1.delete();
+        f2.delete();
     }
 }
