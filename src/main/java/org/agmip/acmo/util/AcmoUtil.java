@@ -32,6 +32,7 @@ public class AcmoUtil {
      *
      */
     public static void writeAcmo(String outputPath, HashMap<String, Object> datapackage, String destModel) {
+        HashMap<String, String> wstClimMap = new HashMap<String, String>();
         try {
             // Make sure the outputPath exists
             File f = new File(outputPath);
@@ -40,13 +41,24 @@ public class AcmoUtil {
             log.debug("Attempting to write {}", fileName);
             FileWriter fw     = new FileWriter(fileName);
             BufferedWriter bw = new BufferedWriter(fw);
+            // Index the Weather Stations
+            for (HashMap<String, Object> wst : MapUtil.getRawPackageContents(datapackage, "weathers")) {
+                wstClimMap.put(MapUtil.getValueOr(wst, "wst_id", ""), MapUtil.getValueOr(wst, "clim_id", "0XXX"));
+            }
+
             try {
                 // First write the header
                 bw.write(generateAcmoHeader());
                  // Then write the lines
                 ArrayList<HashMap<String, Object>> experiments = MapUtil.getRawPackageContents(datapackage, "experiments");
                 for (HashMap<String, Object> experiment : experiments) {
-                    String acmoData = extractAcmoData(experiment, destModel);
+                    // get WSTID and pass the CLIM_ID from that.
+                    String wstId = MapUtil.getValueOr(experiment, "wst_id", "");
+                    String climId = wstClimMap.get(wstId);
+                    if (climId == null) {
+                        climId = "0XXX";
+                    }
+                    String acmoData = extractAcmoData(experiment, destModel, climId);
                     log.debug("ACMO dataline: {}", acmoData);
                     bw.write(acmoData);
                     bw.write("\n");
@@ -70,10 +82,12 @@ public class AcmoUtil {
      *
      * @return ACMO compatible CSV line.
      */
-    public static String extractAcmoData(HashMap<String, Object> dataset, String destModel) {
+    public static String extractAcmoData(HashMap<String, Object> dataset, String destModel, String climId) {
         ArrayList<String> acmoData = new ArrayList<String>();
         HashMap<String, Object> observed = MapUtil.getRawBucket(dataset, "observed");
         HashMap<String, String> events   = extractEventData(dataset, destModel);
+
+
         /**
          * Data to get:
          * wst_id (root)
@@ -112,7 +126,7 @@ public class AcmoUtil {
         acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "seasonal_strategy", "")));
         acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "exname", "")));
         acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "trt_name", "")));
-        acmoData.add(quoteMe(MapUtil.getValueOr(dataset, "clim_id", "0XXX")));
+        acmoData.add(quoteMe(climId));
         acmoData.add("1");
         if (! seasonalStrategyString.equals("")) {
             domeBase = DomeUtil.unpackDomeName(seasonalStrategyString);
@@ -157,7 +171,7 @@ public class AcmoUtil {
      * @return ACMO header
      */
     public static String generateAcmoHeader() {
-        return "!,Experiment ID,,Field Overlay ID,Seasonal Strategy ID,\"Name of experiment, field test or survey\",Treatment Name,4-character Climate ID code,Climate replication number for multiple realizations of weather data (ask Alex),Region ID,Regional stratum identification number,RAP ID,\"Management regimen ID, for multiple management regimens per RAP\",Names of institutions involved in collection of field or survey data,\"Crop rotation indicator (=1 to indicate that this is a continuous, multi-year simulation, =0 for single year simulations)\",Weather station ID,Soil ID,Site Latitude,Site Longitude,Crop type (common name) ,Crop model-specific cultivar ID,Cultivar name,Start of simulation date,Planting date,\"Observed harvested yield, dry weight\",Observed total above-ground biomass at harvest,Observed harvest date,Total number of irrigation events,Total amount of irrigation,Type of irrigation application,Total number of fertilizer applications,Total N applied,Total P applied,Total K applied,Manure and applied oganic matter,Total number of tillage applications,\"Tillage type (hand, animal or mechanized)\",\"Short name of crop model used for simulations (e.g., DSSAT, APSIM, Aquacrop, STICS, etc.)\",Model name and version number of the crop model used to generate simulated outputs,\"Simulated harvest yield, dry matter\",\"Simulated above-ground biomass at harvest, dry matter\",Simulated anthesis date,Simulated maturity date,Simulated harvest date,\"Simulated leaf area index, maximum\",Total precipitation from planting to harvest,\"Simulated evapotranspiration, planting to harvest\",Simulated N uptake during season,Simulated N leached up to harvest maturity,\n!,text,number,text,text,text,text,code,number,code,number,code,code,text,number,text,text,decimal degrees,decimal degrees,text,text,text,yyyy-mm-dd,yyyy-mm-dd,kg/ha,kg/ha,yyyy-mm-dd,number,mm,text,number,kg[N]/ha,kg[P]/ha,kg[K]/ha,kg/ha,#,text,text,text,kg/ha,kg/ha,yyyy-mm-dd,yyyy-mm-dd,yyyy-mm-dd,m2/m2,mm,mm,kg/ha,kg/ha,\n#,EID,RUN#,FIELD_OVERLAY,SEASONAL_STRATEGY,EXNAME,TRT_NAME,CLIM_ID,CLIM_REP,REG_ID,STRATUM,RAP_ID,MAN_ID,INSTITUTION,ROTATION,WSTA_ID,SOIL_ID,FL_LAT,FL_LONG,CRID_text,CUL_ID,CUL_NAME,SDAT,PDATE,HWAH,CWAH,HDATE,IR#C,IR_TOT,IROP_text,FE_#,FEN_TOT,FEP_TOT,FEK_TOT,OM_TOT,TI_#,TIIMP_text,CROP_MODEL,MODEL_VER,HWAH_S,CWAH_S,ADAT_S,MDAT_S,HADAT_S,LAIX_S,PRCP_S,ETCP_S,NUCM_S,NLCM_S,\n";
+        return "!,Experiment ID,,Field Overlay ID,Seasonal Strategy ID,\"Name of experiment, field test or survey\",Treatment Name,4-character Climate ID code,Climate replication number for multiple realizations of weather data (ask Alex),Region ID,Regional stratum identification number,RAP ID,\"Management regimen ID, for multiple management regimens per RAP\",Names of institutions involved in collection of field or survey data,\"Crop rotation indicator (=1 to indicate that this is a continuous, multi-year simulation, =0 for single year simulations)\",Weather station ID,Soil ID,Site Latitude,Site Longitude,Crop type (common name) ,Crop model-specific cultivar ID,Cultivar name,Start of simulation date,Planting date,\"Observed harvested yield, dry weight\",Observed total above-ground biomass at harvest,Observed harvest date,Total number of irrigation events,Total amount of irrigation,Type of irrigation application,Total number of fertilizer applications,Total N applied,Total P applied,Total K applied,Manure and applied oganic matter,Total number of tillage applications,\"Tillage type (hand, animal or mechanized)\",\"Short name of crop model used for simulations (e.g., DSSAT, APSIM, Aquacrop, STICS, etc.)\",Model name and version number of the crop model used to generate simulated outputs,\"Simulated harvest yield, dry matter\",\"Simulated above-ground biomass at harvest, dry matter\",Simulated anthesis date,Simulated maturity date,Simulated harvest date,\"Simulated leaf area index, maximum\",Total precipitation from planting to harvest,\"Simulated evapotranspiration, planting to harvest\",Simulated N uptake during season,Simulated N leached up to harvest maturity,\n!,text,number,text,text,text,text,code,number,code,number,code,code,text,number,text,text,decimal degrees,decimal degrees,text,text,text,yyyy-mm-dd,yyyy-mm-dd,kg/ha,kg/ha,yyyy-mm-dd,number,mm,text,number,kg[N]/ha,kg[P]/ha,kg[K]/ha,kg/ha,#,text,text,text,kg/ha,kg/ha,yyyy-mm-dd,yyyy-mm-dd,yyyy-mm-dd,m2/m2,mm,mm,kg/ha,kg/ha,\n#,EID,RUN#,FIELD_OVERLAY,SEASONAL_STRATEGY,EXNAME,TRT_NAME,CLIM_ID,CLIM_REP,REG_ID,STRATUM,RAP_ID,MAN_ID,INSTITUTION,ROTATION,WST_ID,SOIL_ID,FL_LAT,FL_LONG,CRID_text,CUL_ID,CUL_NAME,SDAT,PDATE,HWAH,CWAH,HDATE,IR#C,IR_TOT,IROP_text,FE_#,FEN_TOT,FEP_TOT,FEK_TOT,OM_TOT,TI_#,TIIMP_text,CROP_MODEL,MODEL_VER,HWAH_S,CWAH_S,ADAT_S,MDAT_S,HADAT_S,LAIX_S,PRCP_S,ETCP_S,NUCM_S,NLCM_S,\n";
     }
 
     protected static HashMap<String, String> extractEventData(HashMap<String, Object> dataset, String destModel) {
