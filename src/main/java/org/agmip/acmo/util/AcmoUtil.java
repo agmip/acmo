@@ -1,11 +1,15 @@
 package org.agmip.acmo.util;
 
+import au.com.bytecode.opencsv.CSVReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.agmip.util.MapUtil;
 import org.agmip.ace.LookupCodes;
@@ -342,25 +346,160 @@ public class AcmoUtil {
     }
     
     /**
-     * Generate an ACMO CSV file object with a non-repeated file name in 
-     * the given directory.
+     * Generate an ACMO CSV file object with a non-repeated file name in the
+     * given directory. The naming rule is as follow,
+     * ACMO-[Region]-[stratum]-[climate_id]-[RAP_id]-[Management_id]-[model].csv
      *
      * @param outputCsvPath The output path for CSV file
      * @param mode The name of model which provide the model output data
      * @return The {@code File} for CSV file
      */
     public static File createCsvFile(String outputCsvPath, String mode) {
+        return createCsvFile(outputCsvPath, mode, null);
+    }
+
+    /**
+     * Generate an ACMO CSV file object with a non-repeated file name in the
+     * given directory.
+     *
+     * @param outputCsvPath The output path for CSV file
+     * @param mode The name of model which provide the model output data
+     * @return The {@code File} for CSV file
+     */
+    public static File createCsvFile(String outputCsvPath, String mode, String metaFilePath) {
         if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.equals("")) {
             outputCsvPath += File.separator;
         }
-        outputCsvPath += "ACMO_" + mode;
+        String domeInfo = "";
+        if (metaFilePath != null) {
+            try {
+                // Read meta data
+                CSVReader reader = new CSVReader(new FileReader(metaFilePath), ',', '"');
+                List<String[]> metaData = reader.readAll();
+                // Get Title and first record
+                String[] title = new String[0];
+                String[] data = new String[0];
+                for (int i = 0; i < metaData.size() - 1; i++) {
+                    if ("#".equals(metaData.get(i)[0])) {
+                        title = metaData.get(i);
+                        data = metaData.get(i + 1);
+                        break;
+                    }
+                }
+                // Get the position index of Region, stratum, climate ID, RAP ID and Management ID
+                int region = -1;
+                int stratum = -1;
+                int climateId = -1;
+                int rapId = -1;
+                int mgnId = -1;
+                int field = -1;
+                int seasonal = -1;
+                int count = 0;
+                for (int i = 0; i < title.length; i++) {
+                    if ("REG_ID".equalsIgnoreCase(title[i])) {
+                        region = i;
+                        count++;
+                    } else if ("STRATUM".equalsIgnoreCase(title[i])) {
+                        stratum = i;
+                        count++;
+                    } else if ("CLIM_ID".equalsIgnoreCase(title[i])) {
+                        climateId = i;
+                        count++;
+                    } else if ("RAP_ID".equalsIgnoreCase(title[i])) {
+                        rapId = i;
+                        count++;
+                    } else if ("MAN_ID".equalsIgnoreCase(title[i])) {
+                        mgnId = i;
+                        count++;
+                    } else if ("FIELD_OVERLAY".equalsIgnoreCase(title[i])) {
+                        field = i;
+                        count++;
+                    } else if ("SEASONAL_STRATEGY".equalsIgnoreCase(title[i])) {
+                        seasonal = i;
+                        count++;
+                    } else {
+                        continue;
+                    }
+                    if (count == 7) {
+                        break;
+                    }
+                }
+                // Get dome info for creating ACMO file name
+                if (region != -1 && (stratum != -1 || rapId != -1 || mgnId != -1 || climateId != -1)) {
+                    String str;
+                    if ((str = getDomeInfoStr(data, region)).equals("0-")) {
+                        if (!(str = getDomeInfoStr(data, seasonal)).equals("0-")) {
+                        } else if (!(str = getDomeInfoStr(data, field)).equals("0-")) {
+                        } else {
+                            str = "";
+                        }
+                        if (!"".equals(str)) {
+                            HashMap<String, String> domeBase = DomeUtil.unpackDomeName(str);
+                            str = MapUtil.getValueOr(domeBase, "reg_id", "") + "-";
+                        }
+                    }
+                    if (!str.equals("")) {
+                        domeInfo = str;
+                        domeInfo += getDomeInfoStr(data, stratum);
+                        domeInfo += getDomeInfoStr(data, climateId);
+                        domeInfo += getDomeInfoStr(data, rapId);
+                        domeInfo += getDomeInfoStr(data, mgnId);
+                    }
+                }
+            } catch (IOException ex) {
+                domeInfo = "";
+            }
+        }
+        // Create CSV file name
+        outputCsvPath += "ACMO-" + domeInfo + mode;
         File f = new File(outputCsvPath + ".csv");
         int count = 1;
         while (f.exists()) {
             f = new File(outputCsvPath + " (" + count + ").csv");
             count++;
         }
-        
+
         return f;
+    }
+    
+    private static String getDomeInfoStr(String[] data, int id) {
+        if (id < 0) {
+            return "0-";
+        } else if (id < data.length) {
+            if ("".equals(data[id])) {
+                return "0-";
+            } else {
+                return data[id] + "-";
+            }
+        } else {
+            return "0-";
+        }
+    }
+
+    /**
+     * CSV Escape handling for given string.
+     *  " -> ""
+     *  , -> ","
+     *
+     * @param str The string will be escaped for CSV format output
+     * @return Escaped CSV string
+     */
+    public static String escapeCsvStr(String str) {
+        if (str != null || str.equals("")) {
+            boolean needQuote = false;
+            if (str.contains("\"")) {
+                str = str.replaceAll("\"", "\"\"");
+                needQuote = true;
+            }
+            if (!needQuote && str.contains(",")) {
+                needQuote = true;
+            }
+            if (needQuote) {
+                str = "\"" + str + "\"";
+            }
+            return str;
+        } else {
+            return "";
+        }
     }
 }
