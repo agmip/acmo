@@ -133,7 +133,7 @@ public class AcmoUtil {
         } else if (! fieldOverlayString.equals("")){
             domeBase = DomeUtil.unpackDomeName(fieldOverlayString);
         }
-        acmoData.add(quoteMe(MapUtil.getValueOr(domeBase, "region", ""))); // Region
+        acmoData.add(quoteMe(MapUtil.getValueOr(domeBase, "reg_id", ""))); // Region
         acmoData.add(quoteMe(MapUtil.getValueOr(domeBase, "stratum", ""))); // Stratum
         acmoData.add(MapUtil.getValueOr(domeBase, "rap_id", "")); // RAP ID
         acmoData.add(MapUtil.getValueOr(domeBase, "man_id", "")); // MAN ID
