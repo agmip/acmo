@@ -143,7 +143,11 @@ public class AcmoUtil {
         acmoData.add(MapUtil.getValueOr(domeBase, "man_id", "")); // MAN ID
         acmoData.add("AgMIP"); // Institution
         acmoData.add(MapUtil.getValueOr(dataset, "rotation", "0"));
-        acmoData.add(MapUtil.getValueOr(dataset, "wst_id", ""));
+        String wst_id = MapUtil.getValueOr(dataset, "wst_id", "");
+        if (wst_id.length() > 4) {
+            wst_id = wst_id.substring(0 ,4);
+        }
+        acmoData.add(wst_id);
         acmoData.add(MapUtil.getValueOr(dataset, "soil_id", ""));
         acmoData.add(MapUtil.getValueOr(dataset, "fl_lat", ""));
         acmoData.add(MapUtil.getValueOr(dataset, "fl_long", ""));
