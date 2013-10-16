@@ -99,8 +99,8 @@ public class AcmoUtilTest {
     public void createCsvFileTest() {
         String mode = "TEST";
         String outputCsvPath = "";
-        String expected_1 = "ACMO_" + mode + ".csv";
-        String expected_2 = "ACMO_" + mode + " (1).csv";
+        String expected_1 = "ACMO-" + mode + ".csv";
+        String expected_2 = "ACMO-" + mode + " (1).csv";
 
         // Test the case of no pre-existing file 
         File f1 = AcmoUtil.createCsvFile(outputCsvPath, mode);
