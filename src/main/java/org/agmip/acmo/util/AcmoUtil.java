@@ -409,7 +409,7 @@ public class AcmoUtil {
     }
 
     private static String quoteMe(String unquoted) {
-        return "\""+unquoted+"\"";
+        return "\""+unquoted.replaceAll("\"", "\"\"").replaceAll("\\\\", "\\\\\\\\") +"\"";
     }
     
     /**
