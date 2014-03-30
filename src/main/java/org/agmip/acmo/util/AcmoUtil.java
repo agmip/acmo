@@ -446,12 +446,12 @@ public class AcmoUtil {
                 reader.close();
                 // Get Title and first record
                 String[] title = new String[0];
-                String[] data = new String[0];
+                ArrayList<String[]> dataArr = new ArrayList();
                 for (int i = 0; i < metaData.size() - 1; i++) {
                     if ("#".equals(metaData.get(i)[0])) {
                         title = metaData.get(i);
-                        data = metaData.get(i + 1);
-                        break;
+                    } else if ("*".equals(metaData.get(i)[0])) {
+                        dataArr.add(metaData.get(i));
                     }
                 }
                 // Get the position index of Region, stratum, climate ID, RAP ID and Management ID
@@ -493,25 +493,29 @@ public class AcmoUtil {
                     }
                 }
                 // Get dome info for creating ACMO file name
-                if (region != -1 && (stratum != -1 || rapId != -1 || mgnId != -1 || climateId != -1)) {
+                if (!dataArr.isEmpty() && region != -1 && (stratum != -1 || rapId != -1 || mgnId != -1 || climateId != -1)) {
                     String str;
-                    if ((str = getDomeInfoStr(data, region)).equals("0-")) {
-                        if (!(str = getDomeInfoStr(data, seasonal)).equals("0-")) {
-                        } else if (!(str = getDomeInfoStr(data, field)).equals("0-")) {
+                    if ((str = getDomeInfoStr(dataArr.get(0), region)).equals("0-")) {
+                        if (!(str = getDomeInfoStr(dataArr.get(0), seasonal)).equals("0-")) {
+                        } else if (!(str = getDomeInfoStr(dataArr.get(0), field)).equals("0-")) {
                         } else {
                             str = "";
                         }
                         if (!"".equals(str)) {
                             HashMap<String, String> domeBase = DomeUtil.unpackDomeName(str);
-                            str = MapUtil.getValueOr(domeBase, "reg_id", "") + "-";
+                            str = MapUtil.getValueOr(domeBase, "reg_id", "");
+                            if (!str.equals("")) {
+                                 str += "-";
+                            }
                         }
-                    }
-                    if (!str.equals("")) {
-                        domeInfo = str;
-                        domeInfo += getDomeInfoStr(data, stratum);
-                        domeInfo += getDomeInfoStr(data, climateId);
-                        domeInfo += getDomeInfoStr(data, rapId);
-                        domeInfo += getDomeInfoStr(data, mgnId);
+                    } else {
+                        if (!str.equals("")) {
+                            domeInfo = str;
+                            domeInfo += getDomeInfoStr(dataArr, stratum);
+                            domeInfo += getDomeInfoStr(dataArr.get(0), climateId);
+                            domeInfo += getDomeInfoStr(dataArr, rapId);
+                            domeInfo += getDomeInfoStr(dataArr, mgnId);
+                        }
                     }
                 }
             } catch (IOException ex) {
@@ -541,6 +545,24 @@ public class AcmoUtil {
             }
         } else {
             return "0-";
+        }
+    }
+    
+    private static String getDomeInfoStr(ArrayList<String[]> dataArr, int id) {
+        if (id < 0) {
+            return "0-";
+        } else if (dataArr.isEmpty()) {
+            return "0-";
+        } else {
+            String ret = getDomeInfoStr(dataArr.get(0), id);
+            for (int i = 1; i < dataArr.size(); i++) {
+                String tmp = ret;
+                ret = getDomeInfoStr(dataArr.get(i), id);
+                if (!tmp.equals(ret)) {
+                    return "M-";
+                }
+            }
+            return ret;
         }
     }
 
