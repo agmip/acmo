@@ -98,6 +98,7 @@ public class AcmoUtil {
      * @param dataset a single AgMIP dataset
      * @param destModel the destination model name
      * @param domeIdHashMap the map hold the data as [DOME ID] : [calculated hash for its content]
+     * @param ids including clime ID, wid and sid
      *
      * @return ACMO compatible CSV line.
      */
@@ -256,7 +257,7 @@ public class AcmoUtil {
         int tilCount = 0;
         ArrayList<String> irop = new ArrayList<String>();
         ArrayList<String> timp = new ArrayList<String>();
-        BigDecimal irrAmount, fenAmount, fekAmount, fepAmount, omAmount = null;
+        BigDecimal irrAmount, fenAmount, fekAmount, fepAmount, omAmount;
         try {
             irrAmount = new BigDecimal(0.0);
             fenAmount = new BigDecimal(0.0);
@@ -334,7 +335,6 @@ public class AcmoUtil {
                     }
                 } catch (Exception ex) {
                     log.error("Error converting fertilizer [phosphorus] with value {}", feamn);
-                    continue;
                 }
             } else if (currentEvent.equals("organic_matter")) {
                 String omamt = MapUtil.getValueOr(event, "omamt", "");
@@ -343,7 +343,6 @@ public class AcmoUtil {
                         omAmount = omAmount.add(new BigDecimal(omamt));
                     } catch (Exception ex) {
                         log.error("Error converting organic matter amount with value {}", omamt);
-                        continue;
                     }
                 }
             } else if (currentEvent.equals("tillage")) {
@@ -432,6 +431,7 @@ public class AcmoUtil {
      *
      * @param outputCsvPath The output path for CSV file
      * @param mode The name of model which provide the model output data
+     * @param metaFilePath The path of meta data file
      * @return The {@code File} for CSV file
      */
     public static File createCsvFile(String outputCsvPath, String mode, String metaFilePath) {
@@ -576,7 +576,7 @@ public class AcmoUtil {
      * @return Escaped CSV string
      */
     public static String escapeCsvStr(String str) {
-        if (str != null || str.equals("")) {
+        if (str != null && !str.equals("")) {
             boolean needQuote = false;
             if (str.contains("\"")) {
                 str = str.replaceAll("\"", "\"\"");
