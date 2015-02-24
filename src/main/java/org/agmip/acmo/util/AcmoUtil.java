@@ -149,7 +149,7 @@ public class AcmoUtil {
 
         String fieldOverlayString = MapUtil.getValueOr(dataset, "field_overlay", "");
         String seasonalStrategyString = MapUtil.getValueOr(dataset, "seasonal_strategy", "");
-        HashMap<String, String> domeBase = new HashMap<String, String>();
+        ArrayList<HashMap<String, String>> domeBases = new ArrayList();
 
         acmoData.add("*"); // Just an indication mark, this line stands alone
         acmoData.add(""); // Suite ID, not implemented yet
@@ -170,14 +170,14 @@ public class AcmoUtil {
         acmoData.add(quoteMe(climId));
         acmoData.add("1");
         if (! seasonalStrategyString.equals("")) {
-            domeBase = DomeUtil.unpackDomeName(seasonalStrategyString);
-        } else if (! fieldOverlayString.equals("")){
-            domeBase = DomeUtil.unpackDomeName(fieldOverlayString);
+            domeBases.addAll(getDomeMetaInfos(seasonalStrategyString));
         }
-        acmoData.add(quoteMe(MapUtil.getValueOr(domeBase, "reg_id", ""))); // Region
-        acmoData.add(quoteMe(MapUtil.getValueOr(domeBase, "stratum", ""))); // Stratum
-        acmoData.add(MapUtil.getValueOr(domeBase, "rap_id", "")); // RAP ID
-        acmoData.add(MapUtil.getValueOr(domeBase, "man_id", "")); // MAN ID
+        domeBases.addAll(getDomeMetaInfos(fieldOverlayString));
+        
+        acmoData.add(quoteMe(getDomeMetaInfo(domeBases, "reg_id", ""))); // Region
+        acmoData.add(quoteMe(getDomeMetaInfo(domeBases, "stratum", ""))); // Stratum
+        acmoData.add(getDomeMetaInfo(domeBases, "rap_id", "")); // RAP ID
+        acmoData.add(getDomeMetaInfo(domeBases, "man_id", "")); // MAN ID
         acmoData.add("AgMIP"); // Institution
         acmoData.add(MapUtil.getValueOr(dataset, "rotation", "0"));
         String wst_id = MapUtil.getValueOr(dataset, "wst_id", "");
@@ -216,6 +216,30 @@ public class AcmoUtil {
         return joinList(acmoData, ",");
     }
     
+    private static ArrayList<HashMap<String, String>> getDomeMetaInfos(String domeStr) {
+        ArrayList<HashMap<String, String>> ret = new ArrayList();
+        String[] domes = domeStr.split("[|]");
+        for (String dome : domes) {
+            ret.add(DomeUtil.unpackDomeName(dome));
+        }
+        return ret;
+    }
+
+    private static String getDomeMetaInfo(ArrayList<HashMap<String, String>> domeBases, String metaId, String defVal) {
+        String ret = "";
+        for (HashMap<String, String> domeBase : domeBases) {
+            ret = MapUtil.getValueOr(domeBase, metaId, "");
+            if (!ret.equals("")) {
+                break;
+            }
+        }
+        if (ret.equals("")) {
+            return defVal;
+        } else {
+            return ret;
+        }
+    }
+
     private static String getDomeIds(HashMap dataset, String domeType, String domeAppliedFlg) {
         if (MapUtil.getValueOr(dataset, domeAppliedFlg, "").equals("Y")) {
             return MapUtil.getValueOr(dataset, domeType, "");
@@ -430,11 +454,11 @@ public class AcmoUtil {
      * given directory.
      *
      * @param outputCsvPath The output path for CSV file
-     * @param mode The name of model which provide the model output data
+     * @param model The name of model which provide the model output data
      * @param metaFilePath The path of meta data file
      * @return The {@code File} for CSV file
      */
-    public static File createCsvFile(String outputCsvPath, String mode, String metaFilePath) {
+    public static File createCsvFile(String outputCsvPath, String model, String metaFilePath) {
         if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.equals("")) {
             outputCsvPath += File.separator;
         }
@@ -524,7 +548,7 @@ public class AcmoUtil {
             }
         }
         // Create CSV file name
-        outputCsvPath += "ACMO-" + domeInfo + mode;
+        outputCsvPath += "ACMO-" + domeInfo + model;
         File f = new File(outputCsvPath + ".csv");
         int count = 1;
         while (f.exists()) {
