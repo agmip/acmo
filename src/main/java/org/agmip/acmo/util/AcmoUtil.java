@@ -72,7 +72,7 @@ public class AcmoUtil {
                     // get WSTID and pass the CLIM_ID from that.
                     String wstId = MapUtil.getValueOr(experiment, "wst_id", "");
                     String soilId = MapUtil.getValueOr(experiment, "soil_id", "");
-                    String climId = MapUtil.getValueOr(wstClimMap, wstId, "0XXX");
+                    String climId = MapUtil.getValueOr(experiment, "ctwn_clim_id", MapUtil.getValueOr(wstClimMap, wstId, "0XXX"));
                     String wid = MapUtil.getValueOr(widMap, wstId, "");
                     String sid = MapUtil.getValueOr(sidMap, soilId, "");
                     String acmoData = extractAcmoData(experiment, destModel, domeIdHashMap, climId, wid, sid);
