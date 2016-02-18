@@ -486,7 +486,7 @@ public class AcmoUtil {
                 }
                 // Get the position index of Region, stratum, climate ID, RAP ID and Management ID
                 int region = -1;
-                int stratum = -1;
+                int crop = -1;
                 int climateId = -1;
                 int rapId = -1;
                 int mgnId = -1;
@@ -497,8 +497,8 @@ public class AcmoUtil {
                     if ("REG_ID".equalsIgnoreCase(title[i])) {
                         region = i;
                         count++;
-                    } else if ("STRATUM".equalsIgnoreCase(title[i])) {
-                        stratum = i;
+                    } else if ("CRID_text".equalsIgnoreCase(title[i])) {
+                        crop = i;
                         count++;
                     } else if ("CLIM_ID".equalsIgnoreCase(title[i])) {
                         climateId = i;
@@ -523,7 +523,7 @@ public class AcmoUtil {
                     }
                 }
                 // Get dome info for creating ACMO file name
-                if (!dataArr.isEmpty() && region != -1 && (stratum != -1 || rapId != -1 || mgnId != -1 || climateId != -1)) {
+                if (!dataArr.isEmpty() && region != -1 && (crop != -1 || rapId != -1 || mgnId != -1 || climateId != -1)) {
                     String str;
                     if ((str = getDomeInfoStr(dataArr.get(0), region)).equals("0-")) {
                         if (!(str = getDomeInfoStr(dataArr.get(0), seasonal)).equals("0-")) {
@@ -541,7 +541,7 @@ public class AcmoUtil {
                     } else {
                         if (!str.equals("")) {
                             domeInfo = str;
-                            domeInfo += getDomeInfoStr(dataArr, stratum);
+                            domeInfo += getDomeInfoStr(dataArr.get(0), crop).replaceAll(" ", "").toUpperCase();
                             domeInfo += getDomeInfoStr(dataArr.get(0), climateId);
                             domeInfo += getDomeInfoStr(dataArr, rapId);
                             domeInfo += getDomeInfoStr(dataArr, mgnId);
