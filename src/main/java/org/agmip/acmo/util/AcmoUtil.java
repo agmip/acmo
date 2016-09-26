@@ -89,7 +89,7 @@ public class AcmoUtil {
             try {
                 // First write the header
                 bw.write(generateAcmoHeader());
-                 // Then write the lines
+                // Then write the lines
                 ArrayList<HashMap<String, Object>> experiments = MapUtil.getRawPackageContents(datapackage, "experiments");
                 for (HashMap<String, Object> experiment : experiments) {
                     // get WSTID and pass the CLIM_ID from that.
@@ -221,16 +221,21 @@ public class AcmoUtil {
             domeBases.addAll(getDomeMetaInfos(seasonalStrategyString));
         }
         domeBases.addAll(getDomeMetaInfos(fieldOverlayString));
-        
-        acmoData.add(quoteMe(getDomeMetaInfo(domeBases, "reg_id", ""))); // Region
+
+        String reg_id = getDomeMetaInfo(domeBases, "reg_id", "");
+        String rap_id = getDomeMetaInfo(domeBases, "rap_id", "");
+        String man_id = getDomeMetaInfo(domeBases, "man_id", "");
+
+        acmoData.add(quoteMe(checkCMSeries(exname, climId, rap_id, man_id))); // CMSS
+        acmoData.add(quoteMe(reg_id)); // Region
         acmoData.add(quoteMe(getDomeMetaInfo(domeBases, "stratum", ""))); // Stratum
-        acmoData.add(getDomeMetaInfo(domeBases, "rap_id", "")); // RAP ID
-        acmoData.add(getDomeMetaInfo(domeBases, "man_id", "")); // MAN ID
+        acmoData.add(rap_id); // RAP ID
+        acmoData.add(man_id); // MAN ID
         acmoData.add("AgMIP"); // Institution
         acmoData.add(MapUtil.getValueOr(dataset, "rotation", "0"));
         String wst_id = MapUtil.getValueOr(dataset, "wst_id", "");
         if (wst_id.length() > 4) {
-            wst_id = wst_id.substring(0 ,4);
+            wst_id = wst_id.substring(0, 4);
         }
         acmoData.add(wst_id);
         acmoData.add(soil_id);
@@ -265,7 +270,7 @@ public class AcmoUtil {
         acmoData.add(destModel.toUpperCase());
         return joinList(acmoData, ",");
     }
-    
+
     private static ArrayList<HashMap<String, String>> getDomeMetaInfos(String domeStr) {
         ArrayList<HashMap<String, String>> ret = new ArrayList();
         String[] domes = domeStr.split("[|]");
@@ -297,7 +302,7 @@ public class AcmoUtil {
             return "";
         }
     }
-    
+
     private static String getDomeHash(HashMap<String, String> domeIdHashMap, String domeIds) {
         ArrayList<String> domeHashs = new ArrayList();
         String[] ids = domeIds.split("\\|");
@@ -307,7 +312,7 @@ public class AcmoUtil {
                 domeHashs.add(hash);
             }
         }
-        
+
         return joinList(domeHashs, "|");
     }
 
@@ -318,7 +323,7 @@ public class AcmoUtil {
      */
     public static String generateAcmoHeader() {
         // Update on 2014/04/29 for ACMO template version 4.1.0
-        return "!,\"ID for suite of sites or experiments\",\"Name of experiment, field test or survey\",Field Overlay (DOME) ID,Seaonal Strategy (DOME) ID,Rotational Analysis (DOME) ID,BATCH (DOME) ID,,,Treatment Name,4-character Climate ID code,Climate scenario category,Climate replication number for multiple realizations of weather data (ask Alex),Region ID,Regional stratum identification number,RAP ID,\"Management regimen ID, for multiple management regimens per RAP\",Names of institutions involved in collection of field or survey data,\"Crop rotation indicator (=1 to indicate that this is a continuous, multi-year simulation, =0 for single year simulations)\",Weather station ID,Soil ID,Site Latitude,Site Longitude,Crop type (common name) ,Crop model-specific cultivar ID,Cultivar name,Start of simulation date,Planting date,\"Observed harvested yield, dry weight\",Observed total above-ground biomass at harvest,Observed harvest date,Total number of irrigation events,Total amount of irrigation,Type of irrigation application,Total number of fertilizer applications,Total N applied,Total P applied,Total K applied,Manure and applied oganic matter,Total number of tillage applications,\"Tillage type (hand, animal or mechanized)\",Experiment ID,Weather ID,Soil ID,DOME ID for Overlay,DOME ID for Seasonal  ,DOME ID for Rotational ,DOME ID for Batch DOME,Translator version,\"Short name of crop model used for simulations (e.g., DSSAT, APSIM, Aquacrop, STICS, etc.)\",Model name and version number of the crop model used to generate simulated outputs,\"Simulated harvest yield, dry matter\",\"Simulated above-ground biomass at harvest, dry matter\",Simulated anthesis date,Simulated maturity date,Simulated harvest date,\"Simulated leaf area index, maximum\",Total precipitation from planting to harvest,\"Simulated evapotranspiration, planting to harvest\",Simulated N uptake during season,Simulated N leached up to harvest maturity,\"Transpiration, cumulative from planting to harvest\",\"Evaporation,soil, cumulative from planting to harvest\"\n!,text,text,text,text,text,text,number,number,text,code,code,number,code,number,code,code,text,number,text,text,decimal degrees,decimal degrees,text,text,text,yyyy-mm-dd,yyyy-mm-dd,kg/ha,kg/ha,yyyy-mm-dd,number,mm,text,number,kg[N]/ha,kg[P]/ha,kg[K]/ha,kg/ha,#,text,text,text,text,text,text,text,text,text,text,text,kg/ha,kg/ha,yyyy-mm-dd,yyyy-mm-dd,yyyy-mm-dd,m2/m2,mm,mm,kg/ha,kg/ha,mm,mm\n#,SUITE_ID,EXNAME,FIELD_OVERLAY,SEASONAL_STRATEGY,ROTATIONAL_ANALYSIS,BATCH_DOME,BATCH_RUN#,RUN#,TRT_NAME,CLIM_ID,CLIM_CAT,CLIM_REP,REG_ID,STRATUM,RAP_ID,MAN_ID,INSTITUTION,ROTATION,WST_ID,SOIL_ID,FL_LAT,FL_LONG,CRID_text,CUL_ID,CUL_NAME,SDAT,PDATE,HWAH,CWAH,HDATE,IR#C,IR_TOT,IROP_text,FE_#,FEN_TOT,FEP_TOT,FEK_TOT,OM_TOT,TI_#,TIIMP_text,EID,WID,SID,DOID,DSID,DRID,BDID,TOOL_VERSION,CROP_MODEL,MODEL_VER,HWAH_S,CWAH_S,ADAT_S,MDAT_S,HADAT_S,LAIX_S,PRCP_S,ETCP_S,NUCM_S,NLCM_S,EPCP_S,ESCP_S\n";
+        return "!,\"ID for suite of sites or experiments\",\"Name of experiment, field test or survey\",Field Overlay (DOME) ID,Seaonal Strategy (DOME) ID,Rotational Analysis (DOME) ID,BATCH (DOME) ID,,,Treatment Name,4-character Climate ID code,Climate scenario category,Climate replication number for multiple realizations of weather data (ask Alex),Crop model simulation set,Region ID,Regional stratum identification number,RAP ID,\"Management regimen ID, for multiple management regimens per RAP\",Names of institutions involved in collection of field or survey data,\"Crop rotation indicator (=1 to indicate that this is a continuous, multi-year simulation, =0 for single year simulations)\",Weather station ID,Soil ID,Site Latitude,Site Longitude,Crop type (common name) ,Crop model-specific cultivar ID,Cultivar name,Start of simulation date,Planting date,\"Observed harvested yield, dry weight\",Observed total above-ground biomass at harvest,Observed harvest date,Total number of irrigation events,Total amount of irrigation,Type of irrigation application,Total number of fertilizer applications,Total N applied,Total P applied,Total K applied,Manure and applied oganic matter,Total number of tillage applications,\"Tillage type (hand, animal or mechanized)\",Experiment ID,Weather ID,Soil ID,DOME ID for Overlay,DOME ID for Seasonal  ,DOME ID for Rotational ,DOME ID for Batch DOME,Translator version,\"Short name of crop model used for simulations (e.g., DSSAT, APSIM, Aquacrop, STICS, etc.)\",Model name and version number of the crop model used to generate simulated outputs,\"Simulated harvest yield, dry matter\",\"Simulated above-ground biomass at harvest, dry matter\",Simulated anthesis date,Simulated maturity date,Simulated harvest date,\"Simulated leaf area index, maximum\",Total precipitation from planting to harvest,\"Simulated evapotranspiration, planting to harvest\",Simulated N uptake during season,Simulated N leached up to harvest maturity,\"Transpiration, cumulative from planting to harvest\",\"Evaporation,soil, cumulative from planting to harvest\",\"Solar radiation, average, sowing to harvest\",\"Maximum daily air temperature, average, sowing to harvest\",\"Minimum daily air temperature, average, sowing to harvest\",\"Daily air temperature, average, sowing to harvest\",\"CO2 concentration, atmospheric average over day\"\n!,text,text,text,text,text,text,number,number,text,code,code,number,code,code,number,code,code,text,number,text,text,decimal degrees,decimal degrees,text,text,text,yyyy-mm-dd,yyyy-mm-dd,kg/ha,kg/ha,yyyy-mm-dd,number,mm,text,number,kg[N]/ha,kg[P]/ha,kg[K]/ha,kg/ha,#,text,text,text,text,text,text,text,text,text,text,text,kg/ha,kg/ha,yyyy-mm-dd,yyyy-mm-dd,yyyy-mm-dd,m2/m2,mm,mm,kg/ha,kg/ha,mm,mm,MJ/m2.d,C,C,C,vpm\n#,SUITE_ID,EXNAME,FIELD_OVERLAY,SEASONAL_STRATEGY,ROTATIONAL_ANALYSIS,BATCH_DOME,BATCH_RUN#,RUN#,TRT_NAME,CLIM_ID,CLIM_CAT,CLIM_REP,CMSS,REG_ID,STRATUM,RAP_ID,MAN_ID,INSTITUTION,ROTATION,WST_ID,SOIL_ID,FL_LAT,FL_LONG,CRID_text,CUL_ID,CUL_NAME,SDAT,PDATE,HWAH,CWAH,HDATE,IR#C,IR_TOT,IROP_text,FE_#,FEN_TOT,FEP_TOT,FEK_TOT,OM_TOT,TI_#,TIIMP_text,EID,WID,SID,DOID,DSID,DRID,BDID,TOOL_VERSION,CROP_MODEL,MODEL_VER,HWAH_S,CWAH_S,ADAT_S,MDAT_S,HADAT_S,LAIX_S,PRCP_S,ETCP_S,NUCM_S,NLCM_S,EPCP_S,ESCP_S,SRAA_S,TMAXA_S,TMINA_S,TAVGA_S,CO2D_S\n";
     }
 
     protected static HashMap<String, String> extractEventData(HashMap<String, Object> dataset, String destModel) {
@@ -384,8 +389,8 @@ public class AcmoUtil {
                 String feamk = MapUtil.getValueOr(event, "feamk", "");
                 String feamp = MapUtil.getValueOr(event, "feamp", "");
                 log.debug("Feamn amount: {}", feamn);
-                 try {
-                     if (!feamn.equals("")) {
+                try {
+                    if (!feamn.equals("")) {
                         fenAmount = fenAmount.add(new BigDecimal(feamn));
                     }
                 } catch (Exception ex) {
@@ -485,7 +490,7 @@ public class AcmoUtil {
     private static String quoteMe(String unquoted) {
         return "\""+unquoted.replaceAll("\"", "\"\"").replaceAll("\\\\", "\\\\\\\\") +"\"";
     }
-    
+
     /**
      * Generate an ACMO CSV file object with a non-repeated file name in the
      * given directory. The naming rule is as follow,
@@ -580,7 +585,7 @@ public class AcmoUtil {
                             HashMap<String, String> domeBase = DomeUtil.unpackDomeName(str);
                             str = MapUtil.getValueOr(domeBase, "reg_id", "");
                             if (!str.equals("")) {
-                                 str += "-";
+                                str += "-";
                             }
                         }
                     } else {
@@ -608,11 +613,11 @@ public class AcmoUtil {
 
         return f;
     }
-    
+
     public static String addAcmouiVersion(String line, String acmouiVer) {
         return line.replaceFirst("acmoui=", "acmoui="+acmouiVer);
     }
-    
+
     private static String getDomeInfoStr(String[] data, int id) {
         if (id < 0) {
             return "0-";
@@ -626,7 +631,7 @@ public class AcmoUtil {
             return "0-";
         }
     }
-    
+
     private static String getDomeInfoStr(ArrayList<String[]> dataArr, int id) {
         if (id < 0) {
             return "0-";
@@ -670,5 +675,38 @@ public class AcmoUtil {
         } else {
             return "";
         }
+    }
+
+    public static String checkCMSeries(String exname, String climId, String rapId, String manId) {
+
+        String cmSeries = "";
+
+        if (exname != null && !exname.equals("")) {
+
+            if (!exname.matches("(\\w+_\\d+)_b\\w+__\\d+")
+                    && !exname.matches("(\\w+_\\d+)__\\d+")) {
+                cmSeries = "CM0";
+            } // According to the AgMIP Protocols, using X as the last
+            // indicator means no scenarios.
+            else if (climId.startsWith("0") && climId.endsWith("X")) {
+                if (rapId.equals("")) {
+                    if (manId.equals("")) {
+                        cmSeries = "CM1";
+                    } else {
+                        cmSeries = "CM3";
+                    }
+                } else {
+                    cmSeries = "CM4";
+                }
+            } else if (rapId.equals("")) {
+                cmSeries = "CM2";
+            } else if (manId.equals("")) {
+                cmSeries = "CM5";
+            } else {
+                cmSeries = "CM6";
+            }
+        }
+
+        return cmSeries;
     }
 }
