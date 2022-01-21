@@ -97,7 +97,7 @@ public class AcmoUtil {
                     String soilId = MapUtil.getValueOr(experiment, "soil_id", "");
                     String climId = MapUtil.getValueOr(experiment, "ctwn_clim_id", MapUtil.getValueOr(wstClimIdMap, wstId, "0XXX"));
                     String climCat = MapUtil.getValueOr(wstClimCatMap, wstId, "");
-                    String quaduiVer = MapUtil.getValueOr(experiment, "quaduiVer", "");;
+                    String quaduiVer = MapUtil.getValueOr(experiment, "quaduiVer", "");
                     String wid = MapUtil.getValueOr(widMap, wstId, "");
                     String sid = MapUtil.getValueOr(sidMap, soilId, "");
                     if (sidMap.containsKey(sid)) {
@@ -217,7 +217,7 @@ public class AcmoUtil {
         acmoData.add(quoteMe(climId));
         acmoData.add(quoteMe(climCat));
         acmoData.add("1");
-        if (! seasonalStrategyString.equals("")) {
+        if (! seasonalStrategyString.isEmpty()) {
             domeBases.addAll(getDomeMetaInfos(seasonalStrategyString));
         }
         domeBases.addAll(getDomeMetaInfos(fieldOverlayString));
@@ -284,11 +284,11 @@ public class AcmoUtil {
         String ret = "";
         for (HashMap<String, String> domeBase : domeBases) {
             ret = MapUtil.getValueOr(domeBase, metaId, "");
-            if (!ret.equals("")) {
+            if (!ret.isEmpty()) {
                 break;
             }
         }
-        if (ret.equals("")) {
+        if (ret.isEmpty()) {
             return defVal;
         } else {
             return ret;
@@ -308,7 +308,7 @@ public class AcmoUtil {
         String[] ids = domeIds.split("\\|");
         for (String id : ids) {
             String hash = MapUtil.getValueOr(domeIdHashMap, id, "");
-            if (!hash.equals("")) {
+            if (!hash.isEmpty()) {
                 domeHashs.add(hash);
             }
         }
@@ -383,7 +383,7 @@ public class AcmoUtil {
                 if (!isPaddy) {
                     irrCount++;
                     try {
-                        if (!irval.equals("")) {
+                        if (!irval.isEmpty()) {
                             irrAmount = irrAmount.add(new BigDecimal(irval));
                         }
                     } catch (Exception ex) {
@@ -402,7 +402,7 @@ public class AcmoUtil {
                 String feamp = MapUtil.getValueOr(event, "feamp", "");
                 log.debug("Feamn amount: {}", feamn);
                 try {
-                    if (!feamn.equals("")) {
+                    if (!feamn.isEmpty()) {
                         fenAmount = fenAmount.add(new BigDecimal(feamn));
                     }
                 } catch (Exception ex) {
@@ -412,7 +412,7 @@ public class AcmoUtil {
                 log.debug(fenAmount.toString());
 
                 try {
-                    if (!feamk.equals("")) {
+                    if (!feamk.isEmpty()) {
                         fekAmount = fekAmount.add(new BigDecimal(feamk));
                     }
                 } catch (Exception ex) {
@@ -421,7 +421,7 @@ public class AcmoUtil {
                 }
 
                 try {
-                    if (!feamp.equals("")) {
+                    if (!feamp.isEmpty()) {
                         fepAmount = fepAmount.add(new BigDecimal(feamp));
                     }
                 } catch (Exception ex) {
@@ -429,7 +429,7 @@ public class AcmoUtil {
                 }
             } else if (currentEvent.equals("organic_matter")) {
                 String omamt = MapUtil.getValueOr(event, "omamt", "");
-                if (! omamt.equals("")) {
+                if (! omamt.isEmpty()) {
                     try {
                         omAmount = omAmount.add(new BigDecimal(omamt));
                     } catch (Exception ex) {
@@ -493,7 +493,7 @@ public class AcmoUtil {
     }
 
     private static String correctDateFormat(String date) {
-        if (! date.equals("")) {
+        if (! date.isEmpty()) {
             StringBuilder d = new StringBuilder(date);
             d.insert(4, "-");
             d.insert(7, "-");
@@ -530,7 +530,7 @@ public class AcmoUtil {
      * @return The {@code File} for CSV file
      */
     public static File createCsvFile(String outputCsvPath, String model, String metaFilePath) {
-        if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.equals("")) {
+        if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.isEmpty()) {
             outputCsvPath += File.separator;
         }
         String domeInfo = "";
@@ -600,12 +600,12 @@ public class AcmoUtil {
                         if (!"".equals(str)) {
                             HashMap<String, String> domeBase = DomeUtil.unpackDomeName(str);
                             str = MapUtil.getValueOr(domeBase, "reg_id", "");
-                            if (!str.equals("")) {
+                            if (!str.isEmpty()) {
                                 str += "-";
                             }
                         }
                     } else {
-                        if (!str.equals("")) {
+                        if (!str.isEmpty()) {
                             domeInfo = str;
                             domeInfo += getDomeInfoStr(dataArr.get(0), crop).replaceAll(" ", "").toUpperCase();
                             domeInfo += getDomeInfoStr(dataArr.get(0), climateId);
@@ -668,14 +668,14 @@ public class AcmoUtil {
 
     /**
      * CSV Escape handling for given string.
-     *  " -> ""
-     *  , -> ","
+     *  " to ""
+     *  , to ","
      *
      * @param str The string will be escaped for CSV format output
      * @return Escaped CSV string
      */
     public static String escapeCsvStr(String str) {
-        if (str != null && !str.equals("")) {
+        if (str != null && !str.isEmpty()) {
             boolean needQuote = false;
             if (str.contains("\"")) {
                 str = str.replaceAll("\"", "\"\"");
@@ -697,7 +697,7 @@ public class AcmoUtil {
 
         String cmSeries = "";
 
-        if (exname != null && !exname.equals("")) {
+        if (exname != null && !exname.isEmpty()) {
 
             if (!exname.matches("(\\w+_\\d+)_b\\w+__\\d+")
                     && !exname.matches("(\\w+_\\d+)__\\d+")) {
@@ -705,8 +705,8 @@ public class AcmoUtil {
             } // According to the AgMIP Protocols, using X as the last
             // indicator means no scenarios.
             else if (climId.startsWith("0") && climId.endsWith("X")) {
-                if (rapId.equals("")) {
-                    if (manId.equals("")) {
+                if (rapId.isEmpty()) {
+                    if (manId.isEmpty()) {
                         cmSeries = "CM1";
                     } else {
                         cmSeries = "CM3";
@@ -714,9 +714,9 @@ public class AcmoUtil {
                 } else {
                     cmSeries = "CM4";
                 }
-            } else if (rapId.equals("")) {
+            } else if (rapId.isEmpty()) {
                 cmSeries = "CM2";
-            } else if (manId.equals("")) {
+            } else if (manId.isEmpty()) {
                 cmSeries = "CM5";
             } else {
                 cmSeries = "CM6";
