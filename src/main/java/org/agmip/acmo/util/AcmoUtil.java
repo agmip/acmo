@@ -97,7 +97,7 @@ public class AcmoUtil {
                     String soilId = MapUtil.getValueOr(experiment, "soil_id", "");
                     String climId = MapUtil.getValueOr(experiment, "ctwn_clim_id", MapUtil.getValueOr(wstClimIdMap, wstId, "0XXX"));
                     String climCat = MapUtil.getValueOr(wstClimCatMap, wstId, "");
-                    String quaduiVer = MapUtil.getValueOr(experiment, "quaduiVer", "");;
+                    String quaduiVer = MapUtil.getValueOr(experiment, "quaduiVer", "");
                     String wid = MapUtil.getValueOr(widMap, wstId, "");
                     String sid = MapUtil.getValueOr(sidMap, soilId, "");
                     if (sidMap.containsKey(sid)) {
@@ -217,7 +217,7 @@ public class AcmoUtil {
         acmoData.add(quoteMe(climId));
         acmoData.add(quoteMe(climCat));
         acmoData.add("1");
-        if (! seasonalStrategyString.equals("")) {
+        if (! seasonalStrategyString.isEmpty()) {
             domeBases.addAll(getDomeMetaInfos(seasonalStrategyString));
         }
         domeBases.addAll(getDomeMetaInfos(fieldOverlayString));
@@ -284,11 +284,11 @@ public class AcmoUtil {
         String ret = "";
         for (HashMap<String, String> domeBase : domeBases) {
             ret = MapUtil.getValueOr(domeBase, metaId, "");
-            if (!ret.equals("")) {
+            if (!ret.isEmpty()) {
                 break;
             }
         }
-        if (ret.equals("")) {
+        if (ret.isEmpty()) {
             return defVal;
         } else {
             return ret;
@@ -308,7 +308,7 @@ public class AcmoUtil {
         String[] ids = domeIds.split("\\|");
         for (String id : ids) {
             String hash = MapUtil.getValueOr(domeIdHashMap, id, "");
-            if (!hash.equals("")) {
+            if (!hash.isEmpty()) {
                 domeHashs.add(hash);
             }
         }
@@ -323,7 +323,7 @@ public class AcmoUtil {
      */
     public static String generateAcmoHeader() {
         // Update on 2014/04/29 for ACMO template version 4.1.0
-        return "!,\"ID for suite of sites or experiments\",\"Name of experiment, field test or survey\",Field Overlay (DOME) ID,Seaonal Strategy (DOME) ID,Rotational Analysis (DOME) ID,BATCH (DOME) ID,,,Treatment Name,4-character Climate ID code,Climate scenario category,Climate replication number for multiple realizations of weather data (ask Alex),Crop model simulation set,Region ID,Regional stratum identification number,RAP ID,\"Management regimen ID, for multiple management regimens per RAP\",Names of institutions involved in collection of field or survey data,\"Crop rotation indicator (=1 to indicate that this is a continuous, multi-year simulation, =0 for single year simulations)\",Weather station ID,Soil ID,Site Latitude,Site Longitude,Crop type (common name) ,Crop model-specific cultivar ID,Cultivar name,Start of simulation date,Planting date,\"Observed harvested yield, dry weight\",Observed total above-ground biomass at harvest,Observed harvest date,Total number of irrigation events,Total amount of irrigation,Type of irrigation application,Total number of fertilizer applications,Total N applied,Total P applied,Total K applied,Manure and applied oganic matter,Total number of tillage applications,\"Tillage type (hand, animal or mechanized)\",Experiment ID,Weather ID,Soil ID,DOME ID for Overlay,DOME ID for Seasonal  ,DOME ID for Rotational ,DOME ID for Batch DOME,Translator version,\"Short name of crop model used for simulations (e.g., DSSAT, APSIM, Aquacrop, STICS, etc.)\",Model name and version number of the crop model used to generate simulated outputs,\"Simulated harvest yield, dry matter\",\"Simulated above-ground biomass at harvest, dry matter\",Simulated anthesis date,Simulated maturity date,Simulated harvest date,\"Simulated leaf area index, maximum\",Total precipitation from planting to harvest,\"Simulated evapotranspiration, planting to harvest\",Simulated N uptake during season,Simulated N leached up to harvest maturity,\"Transpiration, cumulative from planting to harvest\",\"Evaporation,soil, cumulative from planting to harvest\",\"Solar radiation, average, sowing to harvest\",\"Maximum daily air temperature, average, sowing to harvest\",\"Minimum daily air temperature, average, sowing to harvest\",\"Daily air temperature, average, sowing to harvest\",\"CO2 concentration, atmospheric average over day\"\n!,text,text,text,text,text,text,number,number,text,code,code,number,code,code,number,code,code,text,number,text,text,decimal degrees,decimal degrees,text,text,text,yyyy-mm-dd,yyyy-mm-dd,kg/ha,kg/ha,yyyy-mm-dd,number,mm,text,number,kg[N]/ha,kg[P]/ha,kg[K]/ha,kg/ha,#,text,text,text,text,text,text,text,text,text,text,text,kg/ha,kg/ha,yyyy-mm-dd,yyyy-mm-dd,yyyy-mm-dd,m2/m2,mm,mm,kg/ha,kg/ha,mm,mm,MJ/m2.d,C,C,C,vpm\n#,SUITE_ID,EXNAME,FIELD_OVERLAY,SEASONAL_STRATEGY,ROTATIONAL_ANALYSIS,BATCH_DOME,BATCH_RUN#,RUN#,TRT_NAME,CLIM_ID,CLIM_CAT,CLIM_REP,CMSS,REG_ID,STRATUM,RAP_ID,MAN_ID,INSTITUTION,ROTATION,WST_ID,SOIL_ID,FL_LAT,FL_LONG,CRID_text,CUL_ID,CUL_NAME,SDAT,PDATE,HWAH,CWAH,HDATE,IR#C,IR_TOT,IROP_text,FE_#,FEN_TOT,FEP_TOT,FEK_TOT,OM_TOT,TI_#,TIIMP_text,EID,WID,SID,DOID,DSID,DRID,BDID,TOOL_VERSION,CROP_MODEL,MODEL_VER,HWAH_S,CWAH_S,ADAT_S,MDAT_S,HADAT_S,LAIX_S,PRCP_S,ETCP_S,NUCM_S,NLCM_S,EPCP_S,ESCP_S,SRAA_S,TMAXA_S,TMINA_S,TAVGA_S,CO2D_S\n";
+        return "!,\"ID for suite of sites or experiments\",\"Name of experiment, field test or survey\",Field Overlay (DOME) ID,Seaonal Strategy (DOME) ID,Rotational Analysis (DOME) ID,BATCH (DOME) ID,,,Treatment Name,4-character Climate ID code,Climate scenario category,Climate replication number for multiple realizations of weather data (ask Alex),Crop model simulation set,Region ID,Regional stratum identification number,RAP ID,\"Management regimen ID, for multiple management regimens per RAP\",Names of institutions involved in collection of field or survey data,\"Crop rotation indicator (=1 to indicate that this is a continuous, multi-year simulation, =0 for single year simulations)\",Weather station ID,Soil ID,Site Latitude,Site Longitude,Crop type (common name) ,Crop model-specific cultivar ID,Cultivar name,Start of simulation date,Planting date,\"Observed harvested yield, dry weight\",Observed total above-ground biomass at harvest,Observed harvest date,Total number of irrigation events,Total amount of irrigation,Type of irrigation application,Total number of fertilizer applications,Total N applied,Total P applied,Total K applied,Manure and applied oganic matter,Total number of tillage applications,\"Tillage type (hand, animal or mechanized)\",Experiment ID,Weather ID,Soil ID,DOME ID for Overlay,DOME ID for Seasonal  ,DOME ID for Rotational ,DOME ID for Batch DOME,Translator version,\"Short name of crop model used for simulations (e.g., DSSAT, APSIM, Aquacrop, STICS, etc.)\",Model name and version number of the crop model used to generate simulated outputs,\"Simulated harvest yield, dry matter\",\"Simulated above-ground biomass at harvest, dry matter\",Simulated anthesis date,Simulated maturity date,Simulated harvest date,\"Simulated leaf area index, maximum\",Total precipitation from planting to harvest,\"Simulated evapotranspiration, planting to harvest\",Simulated N uptake during season,Simulated N leached up to harvest maturity,\"Transpiration, cumulative from planting to harvest\",\"Evaporation,soil, cumulative from planting to harvest\",\"Solar radiation, average, sowing to harvest\",\"Maximum daily air temperature, average, sowing to harvest\",\"Minimum daily air temperature, average, sowing to harvest\",\"Daily air temperature, average, sowing to harvest\",\"CO2 concentration, atmospheric average over day\",\"Total number of irrigation events\",\"Total amount of irrigation\"\n!,text,text,text,text,text,text,number,number,text,code,code,number,code,code,number,code,code,text,number,text,text,decimal degrees,decimal degrees,text,text,text,yyyy-mm-dd,yyyy-mm-dd,kg/ha,kg/ha,yyyy-mm-dd,number,mm,text,number,kg[N]/ha,kg[P]/ha,kg[K]/ha,kg/ha,#,text,text,text,text,text,text,text,text,text,text,text,kg/ha,kg/ha,yyyy-mm-dd,yyyy-mm-dd,yyyy-mm-dd,m2/m2,mm,mm,kg/ha,kg/ha,mm,mm,MJ/m2.d,C,C,C,vpm,number,mm\n#,SUITE_ID,EXNAME,FIELD_OVERLAY,SEASONAL_STRATEGY,ROTATIONAL_ANALYSIS,BATCH_DOME,BATCH_RUN#,RUN#,TRT_NAME,CLIM_ID,CLIM_CAT,CLIM_REP,CMSS,REG_ID,STRATUM,RAP_ID,MAN_ID,INSTITUTION,ROTATION,WST_ID,SOIL_ID,FL_LAT,FL_LONG,CRID_text,CUL_ID,CUL_NAME,SDAT,PDATE,HWAH,CWAH,HDATE,IR#C,IR_TOT,IROP_text,FE_#,FEN_TOT,FEP_TOT,FEK_TOT,OM_TOT,TI_#,TIIMP_text,EID,WID,SID,DOID,DSID,DRID,BDID,TOOL_VERSION,CROP_MODEL,MODEL_VER,HWAH_S,CWAH_S,ADAT_S,MDAT_S,HADAT_S,LAIX_S,PRCP_S,ETCP_S,NUCM_S,NLCM_S,EPCP_S,ESCP_S,SRAA_S,TMAXA_S,TMINA_S,TAVGA_S,CO2D_S,IR#C_S,IR_TOT_S\n";
     }
 
     protected static HashMap<String, String> extractEventData(HashMap<String, Object> dataset, String destModel) {
@@ -332,6 +332,7 @@ public class AcmoUtil {
         HashMap<String, Object> management = MapUtil.getRawBucket(dataset, "management");
         ArrayList<HashMap<String, String>> events = (ArrayList<HashMap<String, String>>) MapUtil.getObjectOr(management, "events", new ArrayList<HashMap<String, String>>());
         int irrCount = 0;
+        boolean isAutoIrrigation = false;
         int feCount = 0;
         int tilCount = 0;
         ArrayList<String> irop = new ArrayList<String>();
@@ -369,17 +370,28 @@ public class AcmoUtil {
                 String crop = LookupCodes.lookupCode("crid", MapUtil.getValueOr(event, "crid", ""), "cn");
                 results.put("crid", crop);
             } else if (currentEvent.equals("irrigation")) {
-                irrCount++;
                 String irval = MapUtil.getValueOr(event, "irval", "");
-                String sIrOp = LookupCodes.lookupCode("irop", MapUtil.getValueOr(event, "irop", ""), "cn");
-                try {
-                    if (!irval.equals("")) {
-                        irrAmount = irrAmount.add(new BigDecimal(irval));
-                    }
-                } catch (Exception ex) {
-                    log.error("Error converting irrigation amount with value {}", irval);
-                    continue;
+                String sIrIpCode = MapUtil.getValueOr(event, "irop", "");
+                String sIrOp = LookupCodes.lookupCode("irop", sIrIpCode, "cn");
+                boolean isPaddy = false;
+                if (sIrIpCode.equals("IR008") || sIrIpCode.equals("IR009") || sIrIpCode.equals("IR010")) {
+                    isPaddy = true;
+                } else if (sIrIpCode.equals("IR011")) {
+                    isAutoIrrigation = true;
+                    isPaddy = true;
                 }
+                if (!isPaddy) {
+                    irrCount++;
+                    try {
+                        if (!irval.isEmpty()) {
+                            irrAmount = irrAmount.add(new BigDecimal(irval));
+                        }
+                    } catch (Exception ex) {
+                        log.error("Error converting irrigation amount with value {}", irval);
+                        continue;
+                    }
+                }
+                
                 if (! irop.contains(sIrOp)) {
                     irop.add(sIrOp);
                 }
@@ -390,7 +402,7 @@ public class AcmoUtil {
                 String feamp = MapUtil.getValueOr(event, "feamp", "");
                 log.debug("Feamn amount: {}", feamn);
                 try {
-                    if (!feamn.equals("")) {
+                    if (!feamn.isEmpty()) {
                         fenAmount = fenAmount.add(new BigDecimal(feamn));
                     }
                 } catch (Exception ex) {
@@ -400,7 +412,7 @@ public class AcmoUtil {
                 log.debug(fenAmount.toString());
 
                 try {
-                    if (!feamk.equals("")) {
+                    if (!feamk.isEmpty()) {
                         fekAmount = fekAmount.add(new BigDecimal(feamk));
                     }
                 } catch (Exception ex) {
@@ -409,7 +421,7 @@ public class AcmoUtil {
                 }
 
                 try {
-                    if (!feamp.equals("")) {
+                    if (!feamp.isEmpty()) {
                         fepAmount = fepAmount.add(new BigDecimal(feamp));
                     }
                 } catch (Exception ex) {
@@ -417,7 +429,7 @@ public class AcmoUtil {
                 }
             } else if (currentEvent.equals("organic_matter")) {
                 String omamt = MapUtil.getValueOr(event, "omamt", "");
-                if (! omamt.equals("")) {
+                if (! omamt.isEmpty()) {
                     try {
                         omAmount = omAmount.add(new BigDecimal(omamt));
                     } catch (Exception ex) {
@@ -433,7 +445,11 @@ public class AcmoUtil {
             }
         }
         // After processing all the events, consume the results of the counters.
-        if (irrCount > 0) {
+        if (isAutoIrrigation) {
+            results.put("ir_count", "auto");
+            results.put("ir_tot", "auto");
+            results.put("irop", joinList(irop, "|"));
+        } else if (irrCount > 0) {
             results.put("ir_count", Integer.toString(irrCount));
             results.put("ir_tot", irrAmount.toString());
             results.put("irop", joinList(irop, "|"));
@@ -477,7 +493,7 @@ public class AcmoUtil {
     }
 
     private static String correctDateFormat(String date) {
-        if (! date.equals("")) {
+        if (! date.isEmpty()) {
             StringBuilder d = new StringBuilder(date);
             d.insert(4, "-");
             d.insert(7, "-");
@@ -514,7 +530,7 @@ public class AcmoUtil {
      * @return The {@code File} for CSV file
      */
     public static File createCsvFile(String outputCsvPath, String model, String metaFilePath) {
-        if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.equals("")) {
+        if (!outputCsvPath.endsWith(File.separator) && !outputCsvPath.isEmpty()) {
             outputCsvPath += File.separator;
         }
         String domeInfo = "";
@@ -584,12 +600,12 @@ public class AcmoUtil {
                         if (!"".equals(str)) {
                             HashMap<String, String> domeBase = DomeUtil.unpackDomeName(str);
                             str = MapUtil.getValueOr(domeBase, "reg_id", "");
-                            if (!str.equals("")) {
+                            if (!str.isEmpty()) {
                                 str += "-";
                             }
                         }
                     } else {
-                        if (!str.equals("")) {
+                        if (!str.isEmpty()) {
                             domeInfo = str;
                             domeInfo += getDomeInfoStr(dataArr.get(0), crop).replaceAll(" ", "").toUpperCase();
                             domeInfo += getDomeInfoStr(dataArr.get(0), climateId);
@@ -652,14 +668,14 @@ public class AcmoUtil {
 
     /**
      * CSV Escape handling for given string.
-     *  " -> ""
-     *  , -> ","
+     *  " to ""
+     *  , to ","
      *
      * @param str The string will be escaped for CSV format output
      * @return Escaped CSV string
      */
     public static String escapeCsvStr(String str) {
-        if (str != null && !str.equals("")) {
+        if (str != null && !str.isEmpty()) {
             boolean needQuote = false;
             if (str.contains("\"")) {
                 str = str.replaceAll("\"", "\"\"");
@@ -681,7 +697,7 @@ public class AcmoUtil {
 
         String cmSeries = "";
 
-        if (exname != null && !exname.equals("")) {
+        if (exname != null && !exname.isEmpty()) {
 
             if (!exname.matches("(\\w+_\\d+)_b\\w+__\\d+")
                     && !exname.matches("(\\w+_\\d+)__\\d+")) {
@@ -689,8 +705,8 @@ public class AcmoUtil {
             } // According to the AgMIP Protocols, using X as the last
             // indicator means no scenarios.
             else if (climId.startsWith("0") && climId.endsWith("X")) {
-                if (rapId.equals("")) {
-                    if (manId.equals("")) {
+                if (rapId.isEmpty()) {
+                    if (manId.isEmpty()) {
                         cmSeries = "CM1";
                     } else {
                         cmSeries = "CM3";
@@ -698,9 +714,9 @@ public class AcmoUtil {
                 } else {
                     cmSeries = "CM4";
                 }
-            } else if (rapId.equals("")) {
+            } else if (rapId.isEmpty()) {
                 cmSeries = "CM2";
-            } else if (manId.equals("")) {
+            } else if (manId.isEmpty()) {
                 cmSeries = "CM5";
             } else {
                 cmSeries = "CM6";
